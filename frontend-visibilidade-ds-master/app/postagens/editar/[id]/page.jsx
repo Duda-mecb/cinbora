@@ -32,6 +32,27 @@ export default function EditPost({ params }) {
     return `${hours}:${minutes}`
   });
 
+ // Canvas Editor
+const canvasRef = useRef(null);
+const [canvasText, setCanvasText] = useState("");
+
+useEffect(() => {
+  const canvas = canvasRef.current;
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+  ctx.fillStyle = "#fff";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+}, []);
+
+const desenharTexto = () => {
+  const canvas = canvasRef.current;
+  const ctx = canvas.getContext("2d");
+  ctx.fillStyle = "#000";
+  ctx.font = "24px Arial";
+  ctx.fillText(canvasText, 50, 50);
+};
+ 
+
   const handleDownload = async () => {
     const response = await fetch(template.imageUrl);
     const blob = await response.blob();
@@ -224,6 +245,26 @@ export default function EditPost({ params }) {
               <Button className="w-full cursor-pointer" onClick={handleUpdatePost}>
                 Atualizar Postagem
               </Button>
+
+                            {/* Editor de Imagem com Texto */}
+              <div className="mt-10">
+                <h3 className="text-lg font-semibold mb-2">Editor de imagem</h3>
+                <canvas
+                  ref={canvasRef}
+                  width={600}
+                  height={400}
+                  className="border border-gray-400 mb-4 rounded"
+                />
+                <div className="flex gap-2">
+                  <Input
+                    value={canvasText}
+                    onChange={(e) => setCanvasText(e.target.value)}
+                    placeholder="Digite um texto para desenhar na imagem"
+                  />
+                  <Button onClick={desenharTexto}>Adicionar texto</Button>
+                </div>
+              </div>
+                                  
             </div>
           </div>
         </div>
