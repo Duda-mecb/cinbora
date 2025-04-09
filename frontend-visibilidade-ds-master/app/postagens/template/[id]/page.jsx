@@ -22,6 +22,10 @@ export default function TemplateEditPage({ params }) {
   const [text, setText] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
+  const [textPosition, setTextPosition] = useState({ x: 40, y: 40 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [offset, setOffset] = useState({ x: 0, y: 0 });
+
   const unwrappedParams = use(params);
 
   const generateCaption = async () => {
@@ -43,14 +47,78 @@ export default function TemplateEditPage({ params }) {
   };
 
   const handleDownload = async () => {
-    const response = await fetch(template.imageUrl);
-    const blob = await response.blob();
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = `${template.name}.png`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    const image = new Image();
+    image.crossOrigin = "anonymous";
+    image.src = template.imageUrl;
+  
+    image.onload = () => {
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+  
+      const imageElement = document.querySelector("img[src='" + template.imageUrl + "']");
+      if (!imageElement) return;
+  
+      const displayWidth = imageElement.clientWidth;
+      const displayHeight = imageElement.clientHeight;
+  
+      canvas.width = image.width;
+      canvas.height = image.height;
+  
+      // Cálculo do scale em relação ao DOM
+      const scaleX = image.width / displayWidth;
+      const scaleY = image.height / displayHeight;
+  
+      ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+  
+      const scaledFontSize = fontSize * scaleY;
+      ctx.font = `${scaledFontSize}px sans-serif`;
+      ctx.fillStyle = color;
+      ctx.textBaseline = "top";
+      ctx.shadowColor = "black";
+      ctx.shadowOffsetX = 1 * scaleX;
+      ctx.shadowOffsetY = 1 * scaleY;
+      ctx.shadowBlur = 3 * scaleX;
+  
+      const x = textPosition.x * scaleX;
+      const y = textPosition.y * scaleY;
+  
+      const lines = text.split("\n");
+      lines.forEach((line, index) => {
+        ctx.fillText(line, x, y + index * (scaledFontSize + 5 * scaleY));
+      });
+  
+      const link = document.createElement("a");
+      link.href = canvas.toDataURL("image/png");
+      link.download = `${template.name}_editado.png`;
+      link.click();
+    };
+  };
+  
+
+  const handleMouseDown = (e) => {
+    setIsDragging(true);
+    const rect = e.target.getBoundingClientRect();
+    setOffset({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    });
+  };
+
+  const handleMouseMove = (e) => {
+    if (!isDragging) return;
+    const container = e.currentTarget.closest(".image-container");
+    if (!container) return;
+
+    const containerRect = container.getBoundingClientRect();
+
+    setTextPosition({
+      x: e.clientX - containerRect.left - offset.x,
+      y: e.clientY - containerRect.top - offset.y,
+    });
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
   };
 
   useEffect(() => {
@@ -86,39 +154,47 @@ export default function TemplateEditPage({ params }) {
               <div className="flex items-center gap-2 flex-1">
                 <label htmlFor="font-size" className="text-sm whitespace-nowrap">Tamanho da fonte:</label>
                 <Input
-                   id="font-size"
-                   type="number"
-                   value={fontSize}
-                   onChange={(e) => setFontSize(Number(e.target.value))}
-                   min={8}
-                   max={72}
-                   className="w-full"
+                  id="font-size"
+                  type="number"
+                  value={fontSize}
+                  onChange={(e) => setFontSize(Number(e.target.value))}
+                  min={8}
+                  max={72}
+                  className="w-full"
                 />
               </div>
             </div>
 
             {template && (
-              <div className="bg-gray-200 dark:bg-gray-700 rounded-lg aspect-square flex items-center justify-center relative group">
+              <div
+                className="bg-gray-200 dark:bg-gray-700 rounded-lg aspect-square flex items-center justify-center relative group image-container"
+                onMouseMove={handleMouseMove}
+                onMouseUp={handleMouseUp}
+                onMouseLeave={handleMouseUp}
+              >
                 <img src={template.imageUrl} alt={template.name} className="w-full h-full object-cover" />
-{text && (
-  <div style={{
-    position: "absolute",
-    top: "40px",
-    left: "40px",
-    fontSize: fontSize + "px",
-    color: setColor,
-    textShadow: "1px 1px 3px black",
-    padding: "5px",
-    zIndex: 10,
-    maxWidth: "90%",
-    wordWrap: "break-word",
-    whiteSpace: "pre-line"
-  }}
->
-    {text}
-  </div>
-)}
-</div>
+                {text && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: textPosition.y,
+                      left: textPosition.x,
+                      fontSize: fontSize + "px",
+                      color,
+                      textShadow: "1px 1px 3px black",
+                      padding: "5px",
+                      zIndex: 10,
+                      maxWidth: "90%",
+                      wordWrap: "break-word",
+                      whiteSpace: "pre-line",
+                      cursor: "move",
+                    }}
+                    onMouseDown={handleMouseDown}
+                  >
+                    {text}
+                  </div>
+                )}
+              </div>
             )}
 
             <div className="mt-2">
@@ -134,20 +210,18 @@ export default function TemplateEditPage({ params }) {
               <label className="block text-lg font-medium mb-2">Selecione uma cor</label>
               <ChromePicker color={color} onChange={(newColor) => setColor(newColor.hex)} disableAlpha={false} />
             </div>
-            
-<div>
-  <label htmlFor="text" className="block text-sm font-medium mb-2">Texto sobre a imagem</label>
-  <Textarea
-  id="text"
-  placeholder="Digite o texto para aparecer sobre a imagem"
-  value={text}
-  onChange={(e) => setText(e.target.value)}
-  className="w-full min-h-[100px]"
-/>
 
-</div>
+            <div>
+              <label htmlFor="text" className="block text-sm font-medium mb-2">Texto sobre a imagem</label>
+              <Textarea
+                id="text"
+                placeholder="Digite o texto para aparecer sobre a imagem"
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                className="w-full min-h-[100px]"
+              />
+            </div>
 
-            
             <div className="pt-4 flex gap-4 w-full">
               <Button className="flex-1 bg-gray-900 hover:bg-gray-800 text-white cursor-pointer" onClick={() => router.push(`/agendamento/${template._id}?imagePath=${encodeURIComponent(template.imageUrl)}`)}>
                 Continuar para agendamento
