@@ -79,8 +79,10 @@ export default function TemplateEditPage({ params }) {
       ctx.shadowOffsetY = 1 * scaleY;
       ctx.shadowBlur = 3 * scaleX;
   
-      const x = textPosition.x * scaleX;
-      const y = textPosition.y * scaleY;
+      const ajusteHorizontal = 2 * scaleX;  
+      const ajusteVertical = 5 * scaleY;    
+      const x = (textPosition.x + ajusteHorizontal) * scaleX;
+      const y = (textPosition.y + ajusteVertical) * scaleY;
   
       const lines = text.split("\n");
       lines.forEach((line, index) => {
