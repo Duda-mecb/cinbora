@@ -210,7 +210,7 @@ export default function TemplateEditPage({ params }) {
           <div className="w-1/2 space-y-6">
             <div className="w-full">
               <label className="block text-lg font-medium mb-2">Selecione uma cor</label>
-              <ChromePicker color={color} onChange={(newColor) => setColor(newColor.hex)} disableAlpha={false} />
+              <ChromePicker color={color} onChange={(newColor) => setColor(newColor.hex)} disableAlpha={true} />
             </div>
 
             <div>
