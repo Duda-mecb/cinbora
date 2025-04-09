@@ -16,8 +16,10 @@ export default function TemplateEditPage({ params }) {
   const [description, setDescription] = useState("");
   const [caption, setCaption] = useState("");
   const [color, setColor] = useState("#ffffff");
+  const [fontSize, setFontSize] = useState(24);
   const [isGenerating, setIsGenerating] = useState(false);
   const [template, setTemplate] = useState(null);
+  const [text, setText] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
   const unwrappedParams = use(params);
@@ -83,14 +85,40 @@ export default function TemplateEditPage({ params }) {
               </Button>
               <div className="flex items-center gap-2 flex-1">
                 <label htmlFor="font-size" className="text-sm whitespace-nowrap">Tamanho da fonte:</label>
-                <Input id="font-size" type="number" defaultValue={16} min={8} max={72} className="w-full" />
+                <Input
+                   id="font-size"
+                   type="number"
+                   value={fontSize}
+                   onChange={(e) => setFontSize(Number(e.target.value))}
+                   min={8}
+                   max={72}
+                   className="w-full"
+                />
               </div>
             </div>
 
             {template && (
               <div className="bg-gray-200 dark:bg-gray-700 rounded-lg aspect-square flex items-center justify-center relative group">
                 <img src={template.imageUrl} alt={template.name} className="w-full h-full object-cover" />
-              </div>
+{text && (
+  <div style={{
+    position: "absolute",
+    top: "40px",
+    left: "40px",
+    fontSize: fontSize + "px",
+    color: setColor,
+    textShadow: "1px 1px 3px black",
+    padding: "5px",
+    zIndex: 10,
+    maxWidth: "90%",
+    wordWrap: "break-word",
+    whiteSpace: "pre-line"
+  }}
+>
+    {text}
+  </div>
+)}
+</div>
             )}
 
             <div className="mt-2">
@@ -106,20 +134,20 @@ export default function TemplateEditPage({ params }) {
               <label className="block text-lg font-medium mb-2">Selecione uma cor</label>
               <ChromePicker color={color} onChange={(newColor) => setColor(newColor.hex)} disableAlpha={false} />
             </div>
-            <div>
-              <label htmlFor="description" className="block text-sm font-medium mb-2">Gere um texto criativo para o template</label>
-              <Input id="description" placeholder="Descreva brevemente seu template" value={description} onChange={(e) => setDescription(e.target.value)} />
-            </div>
-            <div className="flex justify-center">
-              <Button onClick={generateCaption} className="w-full cursor-pointer" disabled={isGenerating}>
-                {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                Gerar texto criativo
-              </Button>
-            </div>
-            <div>
-              <label htmlFor="caption" className="block text-sm font-medium mb-2">Texto gerado</label>
-              <Textarea id="caption" placeholder="Texto..." value={caption} onChange={(e) => setCaption(e.target.value)} className="min-h-[150px]" />
-            </div>
+            
+<div>
+  <label htmlFor="text" className="block text-sm font-medium mb-2">Texto sobre a imagem</label>
+  <Textarea
+  id="text"
+  placeholder="Digite o texto para aparecer sobre a imagem"
+  value={text}
+  onChange={(e) => setText(e.target.value)}
+  className="w-full min-h-[100px]"
+/>
+
+</div>
+
+            
             <div className="pt-4 flex gap-4 w-full">
               <Button className="flex-1 bg-gray-900 hover:bg-gray-800 text-white cursor-pointer" onClick={() => router.push(`/agendamento/${template._id}?imagePath=${encodeURIComponent(template.imageUrl)}`)}>
                 Continuar para agendamento
