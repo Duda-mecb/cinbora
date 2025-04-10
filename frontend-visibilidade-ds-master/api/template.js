@@ -1,9 +1,10 @@
 import axios from "axios";
 
-const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/template`;
+const apiUrl = `${process.env.API_URL}/template`;
 
 export const getTemplates = async () => {
   try {
+    console.log(apiUrl);
     const response = await axios.get(apiUrl);
     return response.data;
   } catch (error) {

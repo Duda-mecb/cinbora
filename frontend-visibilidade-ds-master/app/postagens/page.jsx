@@ -23,6 +23,7 @@ export default function Postagens() {
     try {
       const templates = await getTemplates();
       setTemplates(templates.data);
+      console.log(templates);
     } catch (error) {
       console.error("Erro ao carregar templates:", error);
     } finally {

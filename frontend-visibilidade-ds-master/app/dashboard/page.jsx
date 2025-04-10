@@ -5,18 +5,21 @@ import { useState, useEffect } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { getUserSchedule } from "@/api/schedule";
+import { deletePost, getUserSchedule } from "@/api/schedule";
 
 export default function Dashboard() {
   const router = useRouter();
   const [recentWorks, setRecentWorks] = useState([]);
+  const [postToDelete, setPostToDelete] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const handleEditPost = (id) => {
     router.push(`/postagens/editar/${id}`);
   };
 
   const handleDeletePost = (id) => {
-    console.log(id);
+    setPostToDelete(id);
+    setShowDeleteModal(true);
   };
 
   const fetchRecentWorks = async () => {
@@ -24,6 +27,24 @@ export default function Dashboard() {
     const response = await getUserSchedule(userId, 1);
     setRecentWorks(response.data.posts);
   }
+
+  const confirmDelete = async () => {
+    try {
+      const userId = localStorage.getItem('user_id');
+      const postId = postToDelete;
+      await deletePost(userId, postId);
+      setShowDeleteModal(false);
+      setPostToDelete(null);
+      window.location.reload();
+    } catch (error) {
+      console.error("Error deleting post:", error);
+    }
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteModal(false);
+    setPostToDelete(null);
+  };
 
   useEffect(() => {
     fetchRecentWorks();
@@ -60,8 +81,8 @@ export default function Dashboard() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100 dark:divide-gray-700 border-t border-gray-100 dark:border-gray-700">
-                    {recentWorks.map((post) => (
-                      <tr key={post.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                    {recentWorks.map((post, index) => (
+                      <tr key={`${post.id}-${index}`} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                         <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">{post.postTitle}</td>
                         <td className="px-6 py-4 text-gray-700 dark:text-gray-300">{new Date(post.postDate).toLocaleDateString('pt-BR')}</td>
                         <td className="px-6 py-4">{post.postTime}</td>
@@ -96,6 +117,35 @@ export default function Dashboard() {
             </div>
         </div>
       </div>
+
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-transparent bg-opacity-70 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-sm mx-auto shadow-xl">
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
+              Confirmar exclusão
+            </h3>
+            <p className="text-gray-500 dark:text-gray-400 mb-6">
+              Tem certeza que deseja excluir esta postagem? Esta ação não pode ser desfeita.
+            </p>
+            <div className="flex justify-end space-x-3">
+              <Button
+                variant="outline"
+                onClick={cancelDelete}
+                className="border-gray-300 dark:border-gray-600 cursor-pointer"
+              >
+                Cancelar
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={confirmDelete}
+                className="bg-red-600 hover:bg-red-700 text-white cursor-pointer"
+              >
+                Excluir
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
