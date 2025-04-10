@@ -82,7 +82,7 @@ export default function Header() {
         <Breadcrumb className="hidden sm:block">
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink href="#">Visibilidade, Bora Impactar</BreadcrumbLink>
+              <BreadcrumbLink href="#">CinBora Postar</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
