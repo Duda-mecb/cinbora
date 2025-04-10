@@ -12,7 +12,7 @@ import templateRoutes from "../routes/templateRoutes.js";
 import textGeneratorRoutes from "../routes/textGeneratorRoutes.js";
 
 const app = express();
-const port = process.env.PORT;
+const port = 3011;
 
 app.use(cors());
 app.use(express.json());
@@ -27,7 +27,7 @@ app.use(templateRoutes);
 app.use(textGeneratorRoutes);
 
 const server = app.listen(port, () => {
-  console.log(`Rodando com express na porta ${port}!`);
+  console.log(`Rodando o backend na porta ${port}!`);
 });
 
 export { app, server };
