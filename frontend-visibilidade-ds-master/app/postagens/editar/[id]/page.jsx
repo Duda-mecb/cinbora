@@ -120,20 +120,6 @@ const desenharTexto = () => {
         </div>
 
         <div className="flex flex-1 gap-8">
-          <div className="w-1/2 flex flex-col gap-4">
-            {post && (
-              <div className="bg-gray-200 dark:bg-gray-700 rounded-lg aspect-square flex items-center justify-center relative group">
-                <img src={post.imageUrl} alt={post.postTitle} className="w-full h-full object-cover" />
-              </div>
-            )}
-
-            <div className="mt-2">
-              <Button className="w-full bg-gray-100 hover:bg-gray-200 text-gray-900 border border-gray-300 cursor-pointer" size="sm" onClick={handleDownload}>
-                <Download className="h-4 w-4 mr-2" />
-                Salvar no dispositivo
-              </Button>
-            </div>
-          </div>
 
           <div className="w-1/2 space-y-6">
             <div className="space-y-4">
@@ -246,25 +232,7 @@ const desenharTexto = () => {
                 Atualizar Postagem
               </Button>
 
-                            {/* Editor de Imagem com Texto */}
-              <div className="mt-10">
-                <h3 className="text-lg font-semibold mb-2">Editor de imagem</h3>
-                <canvas
-                  ref={canvasRef}
-                  width={600}
-                  height={400}
-                  className="border border-gray-400 mb-4 rounded"
-                />
-                <div className="flex gap-2">
-                  <Input
-                    value={canvasText}
-                    onChange={(e) => setCanvasText(e.target.value)}
-                    placeholder="Digite um texto para desenhar na imagem"
-                  />
-                  <Button onClick={desenharTexto}>Adicionar texto</Button>
-                </div>
-              </div>
-                                  
+             
             </div>
           </div>
         </div>

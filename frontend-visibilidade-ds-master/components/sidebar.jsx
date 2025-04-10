@@ -39,12 +39,6 @@ const sidebarItems = {
             href: "/calendario",
             isActive: false,
         },
-        {
-            label: "Dúvidas frequentes",
-            icon: HelpCircle,
-            href: "/faq",
-            isActive: false,
-        }
     ]
 }
 
