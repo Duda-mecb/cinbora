@@ -2,7 +2,7 @@
 
 Clonar este repositório
 ```
-git clone https://github.com/theogsb/backend_visibilidade.git
+git clone https://github.com/Duda-mecb/cinbora.git
 ```
 
 Renomeie o arquivo ".env.prod.example" para ".env.prod" e preencha as variáveis de ambiente presentes nele
