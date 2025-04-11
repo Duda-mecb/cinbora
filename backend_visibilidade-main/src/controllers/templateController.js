@@ -1,6 +1,8 @@
 import { TemplateService } from "../services/templateService.js";
 import fs from "fs";
 
+const PORT = 3011;
+
 const handleError = (res, error) => {
   res.status(500).json({
     success: false,
@@ -53,7 +55,7 @@ export class TemplateController {
       const file = req.file;
       const filePath = file.path;
 
-      const imageUrl = `http://localhost:${process.env.PORT}/uploads/publicTemplates/${file.filename}`;
+      const imageUrl = `http://localhost:${PORT}/uploads/publicTemplates/${file.filename}`;
 
       const template = await this.service.createTemplate({
         imagePath: filePath , 
@@ -84,7 +86,7 @@ export class TemplateController {
       const filePath = file.path;
       const templateId = req.params.templateId;
       
-      const imageUrl = `http://localhost:${process.env.PORT}/uploads/publicTemplates/${file.filename}`;
+      const imageUrl = `http://localhost:${PORT}/uploads/publicTemplates/${file.filename}`;
 
       const template = await this.service.updateTemplate(templateId, {
         imagePath: filePath , 

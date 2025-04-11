@@ -1,6 +1,8 @@
 import { ScheduleService } from '../services/scheduleService.js';
 import fs from 'fs';
 
+const PORT = 3011;
+
 const handleError = (res, error) => {
   res.status(500).json({
     success: false,
@@ -61,7 +63,7 @@ export class ScheduleController {
         throw new Error("Nenhuma imagem foi enviada.");
       }
 
-      const imageUrl = `http://localhost:${process.env.PORT}/uploads/usersTemplates/${file.filename}`;
+      const imageUrl = `http://localhost:${PORT}/uploads/usersTemplates/${file.filename}`;
 
       const schedule = await this.service.createPost(userId, { ...postData, imageUrl: imageUrl , imagePath: file.path});
 
@@ -86,7 +88,7 @@ export class ScheduleController {
       const updateData = req.body;
       const file = req.file;
 
-      const imageUrl = `http://localhost:${process.env.PORT}/uploads/usersTemplates/${file.filename}`;
+      const imageUrl = `http://localhost:${PORT}/uploads/usersTemplates/${file.filename}`;
 
       const schedule = await this.service.updatePost(userId, postId, { ...updateData, imageUrl: imageUrl , imagePath: file.path});
 
